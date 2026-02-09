@@ -15,6 +15,7 @@ COPY backend ./backend
 COPY frontend ./frontend
 
 # 6. Port freigeben
+
 EXPOSE 3000
 
 # 7. Startbefehl: server.js im backend-Ordner
