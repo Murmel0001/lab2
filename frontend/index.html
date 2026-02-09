@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Room & Timetable Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Room & Timetable Management</h1>
+
+    <!-- Notifications -->
+    <section class="card">
+        <h2>Notifications</h2>
+        <ul id="notifications" class="list empty">
+            <li class="empty-text">No notifications yet</li>
+        </ul>
+    </section>
+
+    <!-- Buildings -->
+    <section class="card">
+        <h2>Buildings</h2>
+        <ul id="building-list" class="list empty">
+            <li class="empty-text">No buildings available</li>
+        </ul>
+
+        <h3 id="building-form-title">Add new building</h3>
+        <div class="form-row" id="building-form">
+            <input type="text" id="building-name" placeholder="Building name">
+            <input type="text" id="building-address" placeholder="Street / Address">
+            <input type="text" id="building-desc" placeholder="Description">
+            <button onclick="createBuilding()">Add building</button>
+        </div>
+    </section>
+
+    <!-- Rooms -->
+    <section class="card">
+        <h2>Rooms</h2>
+        <ul id="room-list" class="list empty">
+            <li class="empty-text">No rooms available</li>
+        </ul>
+
+        <h3 id="room-form-title">Add new room</h3>
+        <div class="form-row" id="room-form">
+            <select id="room-building">
+                <option value="">-- Select building --</option>
+            </select>
+            <input type="text" id="room-floor" placeholder="Floor">
+            <input type="text" id="room-nr" placeholder="Room number">
+            <input type="text" id="room-capacity" placeholder="Seats">
+            <input type="text" id="room-desc" placeholder="Description">
+            <button onclick="createRoom()">Add room</button>
+        </div>
+    </section>
+
+    <!-- Teachers -->
+    <section class="card">
+        <h2>Teachers</h2>
+        <ul id="teacher-list" class="list empty">
+            <li class="empty-text">No teachers available</li>
+        </ul>
+
+        <h3 id="teacher-form-title">Add new teacher</h3>
+        <div class="form-row" id="teacher-form">
+            <input type="text" id="teacher-first" placeholder="First name">
+            <input type="text" id="teacher-last" placeholder="Last name">
+            <input type="email" id="teacher-email" placeholder="Email">
+            <button onclick="createTeacher()">Add teacher</button>
+        </div>
+    </section>
+
+    <!-- Timetable -->
+    <section class="card">
+        <h2>Timetable</h2>
+        <ul id="timetable-list" class="list empty">
+            <li class="empty-text">No bookings available</li>
+        </ul>
+
+        <h3 id="timetable-form-title">Add new booking</h3>
+        <div class="form-row" id="timetable-form">
+            <select id="tt-building" onchange="loadRoomsForTimetable()">
+                <option value="">Select building first</option>
+            </select>
+            <select id="tt-room">
+                <option value="">Select room</option>
+            </select>
+            <select id="tt-teacher">
+                <option value="">Select teacher</option>
+            </select>
+            <input type="datetime-local" id="tt-start">
+            <input type="datetime-local" id="tt-end">
+            <input type="text" id="tt-desc" placeholder="Description">
+            <button onclick="createTimetable()">Add booking</button>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
