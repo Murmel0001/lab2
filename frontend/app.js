@@ -1,4 +1,4 @@
-const API = 'http://localhost:3000';
+const API = 'http://172.20.0.17:3000';
 
 // --- Notifications ---
 function showNotification(message, type = 'info') {
