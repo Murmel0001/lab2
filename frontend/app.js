@@ -1,4 +1,4 @@
-const API = 'https://marc-hornig.de';
+const API = 'https://lab2.marc-hornig.de';
 
 // --- Notifications ---
 function showNotification(message, type = 'info') {

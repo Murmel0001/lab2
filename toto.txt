@@ -1,0 +1,4 @@
+1. Description einfügeb bei buildings und rooms
+2. Backend auf englsich 
+3. Zeitzonen umrechnen
+4. Start, end beschriftung bei timetable ergänzenns
