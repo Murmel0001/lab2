@@ -37,6 +37,6 @@ app.use((req, res, next) => {
 });
 
 // --- Server starten ---
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server läuft auf http://localhost:${PORT}`);
 });
