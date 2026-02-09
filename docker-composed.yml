@@ -1,18 +1,9 @@
+version: "3.9"
+
 services:
   app:
     build: .
-    container_name: room-timetable-app
+    container_name: my_app
     ports:
       - "3000:3000"
-    volumes:
-      - ./backend:/app/backend
-      - ./frontend:/app/frontend
-    environment:
-      - NODE_ENV=production
-    networks:
-      MyNetwork:
-        ipv4_address: 172.20.0.14
-
-networks:
-  MyNetwork:
-    external: true
+    restart: unless-stopped

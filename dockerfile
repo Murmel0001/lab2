@@ -1,20 +1,18 @@
-# 1️⃣ Basis-Image
+# 1. Node-Image als Basis
 FROM node:20-alpine
 
-# 2️⃣ Arbeitsverzeichnis im Container
+# 2. Arbeitsverzeichnis im Container
 WORKDIR /app
 
-# 3️⃣ Abhängigkeiten kopieren
+# 3. package.json und package-lock.json kopieren und Dependencies installieren
 COPY package*.json ./
+RUN npm install --production
 
-# 4️⃣ Node Modules installieren
-RUN npm install
-
-# 5️⃣ Restlichen Quellcode kopieren
+# 4. Quellcode kopieren (Backend + Frontend)
 COPY . .
 
-# 6️⃣ Port freigeben
+# 5. Port freigeben
 EXPOSE 3000
 
-# 7️⃣ Startbefehl: Node-Server starten
+# 6. Startbefehl
 CMD ["node", "server.js"]
