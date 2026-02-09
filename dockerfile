@@ -1,33 +1,35 @@
-# 1. Node Base Image
+# --- Base Image: Node + Debian ---
 FROM node:18-bullseye
 
-# 2. Arbeitsverzeichnis
+# --- Arbeitsverzeichnis ---
 WORKDIR /app
 
-# 3. Kopiere nur package.json + package-lock.json zuerst
+# --- Systemabhängigkeiten für node-gyp / native Modules ---
+RUN apt-get update && \
+    apt-get install -y python3 make g++ git && \
+    rm -rf /var/lib/apt/lists/*
+
+# --- package.json + package-lock.json kopieren (Backend zuerst) ---
 COPY backend/package*.json ./backend/
 COPY frontend/package*.json ./frontend/
 
-# 4. Systemabhängigkeiten für Node Modules (falls native Module gebaut werden müssen)
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
-
-# 5. Backend Dependencies installieren
+# --- Backend installieren ---
 WORKDIR /app/backend
 RUN npm install --legacy-peer-deps
 
-# 6. Frontend Dependencies installieren (falls notwendig)
+# --- Frontend installieren (falls nötig) ---
 WORKDIR /app/frontend
 RUN npm install --legacy-peer-deps
 
-# 7. Gesamtes Projekt kopieren
+# --- Restliche Dateien kopieren ---
 WORKDIR /app
 COPY backend ./backend
 COPY frontend ./frontend
 
-# 8. Port freigeben
+# --- Port freigeben ---
 EXPOSE 3000
 
-# 9. Start Command
+# --- Start Command (Backend) ---
 WORKDIR /app/backend
 CMD ["node", "index.js"]
 
