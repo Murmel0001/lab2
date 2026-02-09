@@ -4,7 +4,7 @@ body {
     background: #f4f6f8;
     margin: 0;
     padding: 20px;
-    color: #2f3640;
+    color: #2f4036;
 }
 
 h1 {
@@ -54,7 +54,7 @@ select:focus {
 
 /* ================= Buttons ================= */
 button {
-    background: #40739e;
+    background: #5f983c;
     color: #fff;
     border: none;
     border-radius: 6px;
