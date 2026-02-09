@@ -1,21 +1,29 @@
-# Node.js Basis
-FROM node:20
+# --- Base Image ---
+FROM node:18
 
 # Arbeitsverzeichnis
 WORKDIR /app
 
-# Backend package.json kopieren
-COPY backend/package*.json ./
+# package.json + package-lock.json kopieren
+COPY backend/package*.json ./backend/
+COPY frontend/package*.json ./frontend/
 
-# Abhängigkeiten installieren
+# Install Backend Dependencies
+WORKDIR /app/backend
 RUN npm install
 
-# Backend & Frontend kopieren
+# Install Frontend Dependencies (falls notwendig)
+WORKDIR /app/frontend
+RUN npm install
+
+# App kopieren
+WORKDIR /app
 COPY backend ./backend
 COPY frontend ./frontend
 
-# Port exposen
+# Ports
 EXPOSE 3000
 
-# Starten
-CMD ["node", "backend/server.js"]
+# Start Command (Backend + Static Frontend)
+WORKDIR /app/backend
+CMD ["node", "server.js"]
