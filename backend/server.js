@@ -25,7 +25,14 @@ app.use('/teachers', teacherRoutes);
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Catch-All: Frontend für alle nicht-API-Routen
-app.get('/*', (req, res) => {
+// Catch-All nur für HTML Frontend, alle /api-Routen ausschließen
+app.use((req, res, next) => {
+    if (req.path.startsWith('/rooms') ||
+        req.path.startsWith('/timetable') ||
+        req.path.startsWith('/buildings') ||
+        req.path.startsWith('/teachers')) {
+        return next(); // API-Routen weiterleiten
+    }
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
