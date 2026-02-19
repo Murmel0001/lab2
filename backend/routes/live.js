@@ -10,25 +10,27 @@ router.get('/', async (req, res) => {
     try {
         const now = new Date();
 
-        // alle zukünftigen Belegungen abrufen, sortiert nach start_time
         const [rows] = await db.query(`
-            SELECT 
-                t.id,
-                t.room_id,
-                r.room_nr,
-                t.teacher_id,
-                CONCAT(tea.first_name, ' ', tea.last_name) AS teacher_name,
-                t.start_time,
-                t.end_time,
-                t.description
-            FROM timetable t
-            JOIN room r ON t.room_id = r.id
-            JOIN teacher tea ON t.teacher_id = tea.id
-            WHERE t.end_time > ?
-            ORDER BY t.start_time ASC
-        `, [now]);
+    SELECT 
+        t.id,
+        t.room_id,
+        r.room_nr,
+        b.name AS building_name,
+        b.address AS building_address,
+        t.teacher_id,
+        CONCAT(tea.first_name, ' ', tea.last_name) AS teacher_name,
+        t.start_time,
+        t.end_time,
+        t.description
+    FROM timetable t
+    JOIN room r ON t.room_id = r.id
+    JOIN building b ON r.building_id = b.id
+    JOIN teacher tea ON t.teacher_id = tea.id
+    WHERE t.end_time > ?
+    ORDER BY t.start_time ASC
+`, [now]);
 
-        // Zeiten in Berlin umrechnen und Datum extrahieren
+
         const rowsBerlin = rows.map(r => {
             const startBerlin = utcToZonedTime(r.start_time, TIMEZONE);
             const endBerlin = utcToZonedTime(r.end_time, TIMEZONE);
@@ -40,14 +42,13 @@ router.get('/', async (req, res) => {
             };
         });
 
-        // nach Datum gruppieren
         const grouped = {};
         rowsBerlin.forEach(r => {
             if (!grouped[r.date]) grouped[r.date] = [];
             grouped[r.date].push(r);
         });
 
-        // HTML ausgeben
+        // HTML
         res.send(`
 <!DOCTYPE html>
 <html lang="en">
@@ -79,7 +80,12 @@ ${Object.keys(grouped).map(date => `
             return `
         <div class="booking ${isCurrent ? 'current' : ''}">
             <div class="time">${b.start_time} - ${b.end_time}</div>
-            <div class="room">Room ${b.room_nr}</div>
+            <div class="room">
+    Room ${b.room_nr}<br>
+    <small>${b.building_name}</small><br>
+    <small>${b.building_address}</small>
+</div>
+
             <div class="teacher">${b.teacher_name}</div>
             <div class="desc">${b.description || ''}</div>
         </div>`;
@@ -88,7 +94,7 @@ ${Object.keys(grouped).map(date => `
 
 <script>
     // Auto-refresh alle 30 Sekunden
-    setTimeout(() => { window.location.reload(); }, 30000);
+    setTimeout(() => { window.location.reload(); }, 3000);
 </script>
 </body>
 </html>
