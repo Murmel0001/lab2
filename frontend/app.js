@@ -1,4 +1,4 @@
-const API = 'https://marc-hornig.de';
+const API = 'http://lab2.marc-hornig.de';
 
 // --- Notifications ---
 function showNotification(message, type = 'info') {
@@ -31,7 +31,7 @@ function setEmpty(list, text) {
     list.innerHTML = `<li class="empty-text">${text}</li>`;
 }
 
-// --- Gebäude ---
+// --- Building ---
 async function fetchBuildings() {
     try {
         const res = await fetch(`${API}/buildings`);
@@ -54,15 +54,16 @@ async function fetchBuildings() {
 
         buildings.forEach(b => {
             list.innerHTML += `<li>
-                <div>${b.name}</div>
-                <div>${b.address}</div>
-                <div class="buttons">
-                    <button onclick="updateBuilding(${b.id})">Edit</button>
-                    <button onclick="deleteBuilding(${b.id})">Delete</button>
-                </div>
-            </li>`;
-            select.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+        <div>${b.name}</div>
+        <div>${b.address}</div>
+        <div>${b.description || ''}</div>
+        <div class="buttons">
+            <button onclick="updateBuilding(${b.id})">Edit</button>
+            <button onclick="deleteBuilding(${b.id})">Delete</button>
+        </div>
+    </li>`;
         });
+
     } catch (err) {
         console.error(err);
         showNotification('Error loading buildings: ' + err.message, 'error');
@@ -102,7 +103,6 @@ async function createBuilding() {
             return;
         }
 
-        // Clear input fields
         document.getElementById('building-name').value = '';
         document.getElementById('building-address').value = '';
         document.getElementById('building-desc').value = '';
@@ -202,17 +202,18 @@ function updateBuilding(id) {
 }
 
 
-
-// --- Räume ---
+// --- Room ---
 async function fetchRooms() {
     try {
         const resRooms = await fetch(`${API}/rooms`);
         const roomsData = await resRooms.json();
-        window.rooms = roomsData; // <-- WICHTIG
+        window.rooms = roomsData;
 
         const resBuildings = await fetch(`${API}/buildings`);
         const buildings = await resBuildings.json();
-        window.buildings = buildings; // optional, falls du sie brauchst
+        window.buildings = buildings;
+
+        populateBuildingDropdown();
 
         const list = document.getElementById('room-list');
         list.innerHTML = '';
@@ -225,20 +226,35 @@ async function fetchRooms() {
         roomsData.forEach(r => {
             const building = buildings.find(b => b.id === r.building_id);
             const buildingLabel = building ? building.name : 'Unknown';
+
             list.innerHTML += `<li>
-                <div>${buildingLabel}</div>
-                <div>Room ${r.room_nr}, Floor ${r.floor}, Seats ${r.capacity}</div>
-                <div class="buttons">
-                    <button onclick="updateRoom(${r.id})">Edit</button>
-                    <button onclick="deleteRoom(${r.id})">Delete</button>
-                </div>
-            </li>`;
+        <div>${buildingLabel}</div>
+        <div>Room ${r.room_nr}, Floor ${r.floor}, Seats ${r.capacity}</div>
+        <div>${r.description || ''}</div>
+        <div class="buttons">
+            <button onclick="updateRoom(${r.id})">Edit</button>
+            <button onclick="deleteRoom(${r.id})">Delete</button>
+        </div>
+    </li>`;
         });
 
     } catch (err) {
         console.error(err);
         showNotification('Error fetching rooms: ' + err.message, 'error');
     }
+}
+
+function populateBuildingDropdown() {
+    const select = document.getElementById('room-building');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Select building</option>';
+    window.buildings.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = b.name;
+        select.appendChild(opt);
+    });
 }
 
 async function createRoom() {
@@ -266,6 +282,7 @@ async function createRoom() {
             return;
         }
 
+        document.getElementById('room-building').value = '';
         document.getElementById('room-floor').value = '';
         document.getElementById('room-nr').value = '';
         document.getElementById('room-capacity').value = '';
@@ -312,7 +329,6 @@ function updateRoom(id) {
 
     formTitle.textContent = `Edit Room: ${room.room_nr}`;
 
-    // Gebäude-Dropdown vorbereiten
     let buildingOptions = window.buildings.map(b =>
         `<option value="${b.id}" ${b.id === room.building_id ? 'selected' : ''}>${b.name}</option>`
     ).join('');
@@ -327,7 +343,6 @@ function updateRoom(id) {
         <button id="cancel-room-btn">Cancel</button>
     `;
 
-    // Save-Button
     document.getElementById('save-room-btn').onclick = async () => {
         const building_id = document.getElementById('room-building-edit').value;
         const floor = document.getElementById('room-floor-edit').value.trim();
@@ -352,12 +367,10 @@ function updateRoom(id) {
                 return;
             }
 
-            // --- Wichtig: alle Daten neu laden ---
-            await fetchRooms();                  // Räume aktualisieren
-            await fetchTimetable();              // Timetable aktualisieren
-            await fetchBuildingsForTimetable();  // Dropdowns neu setzen
+            await fetchRooms();
+            await fetchTimetable();
+            await fetchBuildingsForTimetable();
 
-            // Formular zurücksetzen
             formTitle.textContent = 'Add new room';
             form.innerHTML = originalHTML;
 
@@ -368,7 +381,6 @@ function updateRoom(id) {
         }
     };
 
-    // Cancel-Button
     document.getElementById('cancel-room-btn').onclick = () => {
         formTitle.textContent = 'Add new room';
         form.innerHTML = originalHTML;
@@ -376,7 +388,7 @@ function updateRoom(id) {
 }
 
 
-// --- Lehrer ---
+// --- Teacher ---
 async function fetchTeachers() {
     try {
         const res = await fetch(`${API}/teachers`);
@@ -436,7 +448,6 @@ async function createTeacher() {
             return;
         }
 
-        // Clear input fields
         document.getElementById('teacher-first').value = '';
         document.getElementById('teacher-last').value = '';
         document.getElementById('teacher-email').value = '';
@@ -535,7 +546,7 @@ function updateTeacher(id) {
 
 
 
-// --- Belegungen ---
+// --- Timetable ---
 async function fetchTimetable() {
     try {
         const res = await fetch(`${API}/timetable`);
@@ -544,14 +555,12 @@ async function fetchTimetable() {
 
         const list = document.getElementById('timetable-list');
 
-        // 🔹 Liste immer sauber leeren
         list.innerHTML = '';
         if (!tts.length) {
             setEmpty(list, 'No bookings available');
             return;
         }
 
-        // Räume und Gebäude einmal laden
         const rooms = window.rooms || [];
         const buildings = window.buildings || [];
 
@@ -657,16 +666,13 @@ async function updateTimetable(id) {
 
     formTitle.textContent = `Edit Booking`;
 
-    // Lehrer-Dropdown
     const teacherOptions = window.teachers.map(t =>
         `<option value="${t.id}" ${t.id === tt.teacher_id ? 'selected' : ''}>${t.first_name} ${t.last_name}</option>`
     ).join('');
 
-    // Finde das Gebäude vom Raum
     const room = window.rooms.find(r => r.id === tt.room_id);
     const buildingId = room?.building_id || '';
 
-    // Gebäude-Dropdown
     const buildingOptions = window.buildings.map(b =>
         `<option value="${b.id}" ${b.id === buildingId ? 'selected' : ''}>${b.name} (${b.address})</option>`
     ).join('');
@@ -682,7 +688,6 @@ async function updateTimetable(id) {
         <button id="cancel-tt-btn">Cancel</button>
     `;
 
-    // Räume laden
     const loadRooms = async () => {
         const buildingId = document.getElementById('tt-building-edit').value;
         const roomSelect = document.getElementById('tt-room-edit');
@@ -699,7 +704,6 @@ async function updateTimetable(id) {
     await loadRooms();
     document.getElementById('tt-building-edit').onchange = loadRooms;
 
-    // Save
     document.getElementById('save-tt-btn').onclick = async () => {
         const room_id = document.getElementById('tt-room-edit').value;
         const teacher_id = document.getElementById('tt-teacher-edit').value;
@@ -725,10 +729,9 @@ async function updateTimetable(id) {
                 return;
             }
 
-            await fetchTimetable(); // Liste neu laden
+            await fetchTimetable();
             formTitle.textContent = 'Add new booking';
 
-            // Formular zurücksetzen
             formRow.innerHTML = `
                 <select id="tt-building" onchange="loadRoomsForTimetable()">
                     <option value="">Select building first</option>
@@ -748,7 +751,6 @@ async function updateTimetable(id) {
         }
     };
 
-    // Cancel
     document.getElementById('cancel-tt-btn').onclick = () => {
         formTitle.textContent = 'Add new booking';
         formRow.innerHTML = `
@@ -799,10 +801,10 @@ async function loadRoomsForTimetable() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await fetchBuildings();    // Buildings zuerst
-    await fetchRooms();        // Rooms danach
-    await fetchTeachers();     // Teachers
-    await fetchTimetable();    // Timetable zuletzt
+    await fetchBuildings();
+    await fetchRooms();
+    await fetchTeachers();
+    await fetchTimetable();
 });
 
 // --- Initial Load ---
@@ -810,7 +812,7 @@ async function init() {
     await fetchBuildings();
     await fetchRooms();
     await fetchTeachers();
-    await fetchTimetable();       // <-- timetable füllen
+    await fetchTimetable();
     await fetchBuildingsForTimetable();
 }
 init();

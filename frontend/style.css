@@ -86,7 +86,7 @@ button.delete {
     border-bottom: 1px solid #ddd;
     padding: 6px 4px;
     display: grid;
-    grid-template-columns: 2fr 3fr 1fr;
+    grid-template-columns: 2fr 3fr 3fr auto;
     /* Name/Details | Mittlere Infos | Buttons */
     align-items: center;
     gap: 6px;
@@ -196,4 +196,14 @@ button.delete {
     /* ganz rechts */
     display: flex;
     gap: 6px;
+}
+
+.list li em {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.list li div {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
