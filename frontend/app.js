@@ -109,6 +109,7 @@ async function createBuilding() {
 
         await fetchBuildings();
         await fetchBuildingsForTimetable();
+        await fetchRooms();
         showNotification(`Building "${name}" created successfully!`, 'success');
 
     } catch (err) {
