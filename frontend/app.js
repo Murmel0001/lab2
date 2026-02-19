@@ -187,6 +187,8 @@ function updateBuilding(id) {
             }
 
             await fetchBuildings();
+            await fetchBuildingsForTimetable();
+            await fetchRooms();
             formTitle.textContent = 'Add new building';
             form.innerHTML = originalHTML;
             showNotification(`Building "${name}" updated!`, 'success');
