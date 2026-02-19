@@ -32,15 +32,26 @@ router.get('/', async (req, res) => {
 
 
         const rowsBerlin = rows.map(r => {
-            const startBerlin = utcToZonedTime(r.start_time, TIMEZONE);
-            const endBerlin = utcToZonedTime(r.end_time, TIMEZONE);
+
+            const startUTC = new Date(r.start_time);
+            const endUTC = new Date(r.end_time);
+
+            const startBerlin = utcToZonedTime(startUTC, TIMEZONE);
+            const endBerlin = utcToZonedTime(endUTC, TIMEZONE);
+
             return {
                 ...r,
+
+                start_time_utc: startUTC,
+                end_time_utc: endUTC,
+
                 start_time: format(startBerlin, 'HH:mm', { timeZone: TIMEZONE }),
                 end_time: format(endBerlin, 'HH:mm', { timeZone: TIMEZONE }),
+
                 date: format(startBerlin, 'yyyy-MM-dd', { timeZone: TIMEZONE })
             };
         });
+
 
         const grouped = {};
         rowsBerlin.forEach(r => {
@@ -66,6 +77,15 @@ router.get('/', async (req, res) => {
     .booking .room { width: 60px; }
     .booking .teacher { flex: 1; }
     .booking .desc { flex: 2; color: #555; }
+    .booking .building {
+    width: 220px;
+}
+
+.booking .building small {
+    font-size: 0.8em;
+    color: #777;
+}
+
 </style>
 </head>
 <body>
@@ -75,14 +95,18 @@ ${Object.keys(grouped).map(date => `
     <h2>${date}</h2>
     ${grouped[date].map(b => {
             const nowBerlin = utcToZonedTime(now, TIMEZONE);
-            const isCurrent = nowBerlin >= utcToZonedTime(b.start_time + 'Z', TIMEZONE) &&
-                nowBerlin <= utcToZonedTime(b.end_time + 'Z', TIMEZONE);
+
+            const isCurrent =
+                nowBerlin >= utcToZonedTime(b.start_time_utc, TIMEZONE) &&
+                nowBerlin <= utcToZonedTime(b.end_time_utc, TIMEZONE);
+
             return `
         <div class="booking ${isCurrent ? 'current' : ''}">
             <div class="time">${b.start_time} - ${b.end_time}</div>
-            <div class="room">
-    Room ${b.room_nr}<br>
-    <small>${b.building_name}</small><br>
+<div class="room">Room ${b.room_nr}</div>
+
+<div class="building">
+    ${b.building_name}<br>
     <small>${b.building_address}</small>
 </div>
 
