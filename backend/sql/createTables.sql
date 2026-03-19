@@ -46,28 +46,48 @@ CREATE TABLE IF NOT EXISTS timetable (
     ON DELETE CASCADE
 );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Indexe
-CREATE INDEX idx_timetable_room ON timetable (room_id);
-CREATE INDEX idx_timetable_start_time ON timetable (start_time);
-CREATE INDEX idx_timetable_end_time ON timetable (end_time);
-CREATE INDEX idx_timetable_room_time ON timetable (room_id, start_time, end_time);
+--CREATE INDEX idx_timetable_room ON timetable (room_id);
+--CREATE INDEX idx_timetable_start_time ON timetable (start_time);
+--CREATE INDEX idx_timetable_end_time ON timetable (end_time);
+--CREATE INDEX idx_timetable_room_time ON timetable (room_id, start_time, end_time);
 
 
-DELIMITER $$
+--DELIMITER $$
 
-CREATE TRIGGER trg_prevent_overlap
-BEFORE INSERT ON timetable
-FOR EACH ROW
-BEGIN
-  IF EXISTS (
-    SELECT 1
-    FROM timetable
-    WHERE room_id = NEW.room_id
-      AND NOT (NEW.end_time <= start_time OR NEW.start_time >= end_time)
-  ) THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT = 'Room is already booked in this time range';
-  END IF;
-END$$
+--CREATE TRIGGER trg_prevent_overlap
+--BEFORE INSERT ON timetable
+--FOR EACH ROW
+--BEGIN
+--  IF EXISTS (
+--    SELECT 1
+--    FROM timetable
+--    WHERE room_id = NEW.room_id
+--      AND NOT (NEW.end_time <= start_time OR NEW.start_time >= end_time)
+--  ) THEN
+--    SIGNAL SQLSTATE '45000'
+--    SET MESSAGE_TEXT = 'Room is already booked in this time range';
+--  END IF;
+--END$$
 
-DELIMITER ;
+--DELIMITER ;
